@@ -10,6 +10,7 @@ interface SidebarProps {
   onSelect: (id: string) => void;
   onCreate: () => void;
   onUpdateMeeting: (id: string, updates: Partial<Meeting>) => void;
+  onOpenSettings: () => void;
 }
 
 const COLORS = [
@@ -23,7 +24,7 @@ const COLORS = [
   '#71717a', // zinc
 ];
 
-export function Sidebar({ meetings, activeId, onSelect, onCreate, onUpdateMeeting }: SidebarProps) {
+export function Sidebar({ meetings, activeId, onSelect, onCreate, onUpdateMeeting, onOpenSettings }: SidebarProps) {
   const cycleColor = (e: React.MouseEvent, meeting: Meeting) => {
     e.stopPropagation();
     const currentColor = meeting.ribbonColor || 'transparent';
@@ -95,7 +96,10 @@ export function Sidebar({ meetings, activeId, onSelect, onCreate, onUpdateMeetin
       </div>
       
       <div className="p-4 border-t border-zinc-200">
-        <button className="flex items-center gap-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors w-full p-2 rounded-md hover:bg-zinc-100">
+        <button 
+          onClick={onOpenSettings}
+          className="flex items-center gap-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors w-full p-2 rounded-md hover:bg-zinc-100"
+        >
           <Settings className="w-4 h-4" />
           Settings
         </button>

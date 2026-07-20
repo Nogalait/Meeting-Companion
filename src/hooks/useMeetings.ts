@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { Meeting } from "../types";
-import { v4 as uuidv4 } from "uuid";
 
 const STORAGE_KEY = "companion_meetings_data";
 
@@ -27,7 +26,7 @@ export function useMeetings() {
 
   const createNewMeeting = useCallback(() => {
     const newMeeting: Meeting = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       title: "Untitled Meeting",
       agenda: "",
       actions: [],
