@@ -1,0 +1,6 @@
+{
+  "name": "Meeting Companion",
+  "description": "An elegant, local-first meeting companion for organizing agendas, tracking action items, and exporting briefs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
