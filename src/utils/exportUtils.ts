@@ -2,6 +2,7 @@ import { Meeting } from "../types";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { format } from "date-fns";
+import { extractResources } from "./markdownUtils";
 
 export function generateMarkdown(meeting: Meeting): string {
   const dateStr = format(meeting.createdAt, "MMMM do, yyyy - HH:mm");
@@ -12,6 +13,16 @@ export function generateMarkdown(meeting: Meeting): string {
   
   md += `## Agenda\n`;
   md += `${meeting.agenda || "No agenda notes."}\n\n`;
+  
+  const resources = extractResources(meeting.agenda);
+  if (resources.length > 0) {
+    md += `## Resources Library\n`;
+    resources.forEach(res => {
+      const displayUrl = res.url.startsWith('data:') ? 'Pasted Image Data' : res.url;
+      md += `- **${res.title}** (${res.type}): ${displayUrl}\n`;
+    });
+    md += `\n`;
+  }
   
   md += `## Actions\n`;
   if (meeting.actions.length === 0) {
@@ -24,6 +35,7 @@ export function generateMarkdown(meeting: Meeting): string {
   
   return md;
 }
+
 
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {

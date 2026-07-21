@@ -1,50 +1,56 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useRef } from "react";
+import { AuditLogEntry } from "../types";
+import { v4 as uuidv4 } from "uuid";
 
-export interface AuditLogEntry {
-  id: string;
-  timestamp: number;
-  action: string;
-  details: string;
-}
-
-const MAX_LOGS = 50; // Rolling log, keeps memory usage low
-const STORAGE_KEY = 'companion_audit_logs';
+const AUDIT_STORAGE_KEY = "companion_audit_log";
+const MAX_AUDIT_LOG_SIZE = 100;
 
 export function useAuditLog() {
   const [logs, setLogs] = useState<AuditLogEntry[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error('Failed to parse audit logs', e);
+    const saved = localStorage.getItem(AUDIT_STORAGE_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Failed to parse audit log");
+      }
     }
     return [];
   });
 
-  useEffect(() => {
-    // Save to local storage asynchronously to minimize main thread blocking
-    const timeout = setTimeout(() => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-    }, 100);
-    return () => clearTimeout(timeout);
-  }, [logs]);
+  const saveTimeoutRef = useRef<number | null>(null);
 
-  const addLog = useCallback((action: string, details: string = '') => {
-    setLogs(prev => {
-      const newEntry: AuditLogEntry = {
-        id: crypto.randomUUID(),
+  const addLog = useCallback((action: string, details: string) => {
+    setLogs((prev) => {
+      const newLog: AuditLogEntry = {
+        id: uuidv4(),
         timestamp: Date.now(),
         action,
         details,
       };
-      // Keep only the most recent MAX_LOGS
-      return [newEntry, ...prev].slice(0, MAX_LOGS);
+      
+      const newLogs = [newLog, ...prev].slice(0, MAX_AUDIT_LOG_SIZE);
+      
+      if (saveTimeoutRef.current) {
+        window.clearTimeout(saveTimeoutRef.current);
+      }
+      
+      saveTimeoutRef.current = window.setTimeout(() => {
+        localStorage.setItem(AUDIT_STORAGE_KEY, JSON.stringify(newLogs));
+      }, 500);
+      
+      return newLogs;
     });
   }, []);
 
   const clearLogs = useCallback(() => {
     setLogs([]);
+    localStorage.removeItem(AUDIT_STORAGE_KEY);
   }, []);
 
-  return { logs, addLog, clearLogs };
+  return {
+    logs,
+    addLog,
+    clearLogs
+  };
 }

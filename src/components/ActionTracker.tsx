@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ActionItem } from '../types';
 import { Plus, Check, Circle, Trash2, Calendar, User } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import { cn } from '../utils/cn';
 
 interface ActionTrackerProps {
@@ -18,7 +19,7 @@ export function ActionTracker({ actions, onChange }: ActionTrackerProps) {
     if (!newAction.trim()) return;
 
     const item: ActionItem = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       action: newAction,
       driver: newDriver || "Unassigned",
       timeline: newTimeline || "TBD",

@@ -16,3 +16,10 @@ export interface Meeting {
   ribbonColor?: string;
   isObfuscated?: boolean;
 }
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: number;
+  action: string;
+  details: string;
+}

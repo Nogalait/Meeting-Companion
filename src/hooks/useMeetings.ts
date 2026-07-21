@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Meeting } from "../types";
+import { v4 as uuidv4 } from "uuid";
 
 const STORAGE_KEY = "companion_meetings_data";
 
@@ -21,12 +22,15 @@ export function useMeetings() {
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(meetings));
+    const timeoutId = window.setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(meetings));
+    }, 500);
+    return () => window.clearTimeout(timeoutId);
   }, [meetings]);
 
   const createNewMeeting = useCallback(() => {
     const newMeeting: Meeting = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       title: "Untitled Meeting",
       agenda: "",
       actions: [],
